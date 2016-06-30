@@ -1,6 +1,13 @@
 # Define custom utilities
 # Test for OSX with [ -n "$IS_OSX" ]
 
+function show_dots {
+    while IFS= read -r line; do
+        printf .
+    done
+    echo
+}
+
 function build_libs {
     # Any stuff that you need to do before you start building the wheels
     # Runs in the root directory of this repository.
@@ -10,17 +17,17 @@ function build_libs {
     else
         alias cmake=cmake28
         cd /
+        build_bzip2
     fi
-    set -x
     curl -LO https://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.tar.gz
     echo Done downloading
     tar zxf boost_1_61_0.tar.gz
     echo Done unpacking
     cd boost_1_61_0
     ./bootstrap.sh
-    ./b2 --prefix=/usr/local
+    # Reduce verbosity by showing dots for continuing stdout lines
+    ./b2 --prefix=/usr/local | show_dots
     cd $start_dir
-    set +x
 }
 
 function build_wheel {
