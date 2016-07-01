@@ -1,7 +1,8 @@
 # Define custom utilities
 # Test for OSX with [ -n "$IS_OSX" ]
 
-function show_dots {
+function dot_per_line {
+    # http://unix.stackexchange.com/questions/117501/in-bash-script-how-to-capture-stdout-line-by-line
     while IFS= read -r line; do
         printf .
     done
@@ -15,18 +16,17 @@ function build_libs {
     if [ -n "$IS_OSX" ]; then
         brew install cmake
     else
-        alias cmake=cmake28
-        cd /
-        build_bzip2
+        ln -sf $(which cmake28) /usr/bin/cmake
     fi
     curl -LO https://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.tar.gz
     echo Done downloading
     tar zxf boost_1_61_0.tar.gz
     echo Done unpacking
     cd boost_1_61_0
-    ./bootstrap.sh
+    ./bootstrap.sh --with-python=python --with-libraries=python --prefix=/usr/local
     # Reduce verbosity by showing dots for continuing stdout lines
-    ./b2 --prefix=/usr/local | show_dots
+    ./b2
+    ./b2 install
     cd $start_dir
 }
 
